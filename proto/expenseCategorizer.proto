@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.alok.grpc.stub";
+
+service ExpenseCategorizer {
+  rpc getExpenseCategory(stream ExpenseCategorizationRequest) returns (stream ExpenseCategorizationResponse);
+}
+
+message ExpenseCategorizationRequest {
+  string head = 1;
+}
+
+message ExpenseCategorizationResponse {
+  string category = 1;
+}

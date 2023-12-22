@@ -11,4 +11,5 @@ class ExpenseCategorizer:
         print(self.model)
 
     def getCategory(self, head):
+        print(head)
         return self.model.predict(self.count_vect.transform([head]).toarray())
