@@ -8,7 +8,6 @@ class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerSer
         self.expenseCategorizer = ExpenseCategorizer();
 
     def getExpenseCategory(self, request_iterator, context):
-        prev_response = [];
         for request in request_iterator:
             print("Request received")
             response = {
@@ -16,3 +15,10 @@ class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerSer
             }
             print(response)
             yield expenseCategorizer_pb2.ExpenseCategorizationResponse(**response)
+
+    def getExpenseCategoryUnary(self, request, context):
+        print("Request received")
+        response = {
+            "category": self.expenseCategorizer.getCategory(request.head)[0]
+        }
+        return expenseCategorizer_pb2.ExpenseCategorizationResponse(**response)
