@@ -21,3 +21,24 @@ docker push alokkusingh/home-category-api:1.0.0
 ```shell
 docker run -p 5051:50051 --rm --name home-category-api alokkusingh/home-category-api
 ```
+```shell
+brew install grpcurl
+```
+```shell
+grpcurl --plaintext localhost:50051 list
+```
+```shell
+grpcurl -plaintext localhost:50051 describe
+```
+```shell
+grpcurl -plaintext localhost:50051 describe ExpenseCategorizer
+```
+```shell
+grpcurl -plaintext localhost:50051 describe grpc.health.v1.Health
+```
+```shell
+grpcurl -plaintext localhost:50051 grpc.health.v1.Health/Check
+```
+```shell
+grpcurl -plaintext -d '{"head": "Netflix recharge"}' localhost:50051 ExpenseCategorizer/getExpenseCategoryUnary
+```
