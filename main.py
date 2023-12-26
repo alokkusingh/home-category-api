@@ -7,9 +7,9 @@ from grpc_health.v1 import health_pb2
 from grpc_health.v1 import health_pb2_grpc
 from grpc_reflection.v1alpha import reflection
 from concurrent import futures
-from stream.grpc.stub import expenseCategorizer_pb2_grpc
-from stream.grpc.stub import expenseCategorizer_pb2
-from stream.grpc.expenseCategorizerServer import ExpenseCategorizerServer
+from interface.grpc.servicer.generated import expenseCategorizer_pb2_grpc
+from interface.grpc.servicer.generated import expenseCategorizer_pb2
+from interface.grpc.servicer.expenseCategorizerServer import ExpenseCategorizerServer
 
 import argparse
 import logging

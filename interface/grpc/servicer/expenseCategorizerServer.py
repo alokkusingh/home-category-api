@@ -1,7 +1,8 @@
 import logging
 
 from module.expenseCategorizer import ExpenseCategorizer
-from stream.grpc.stub import expenseCategorizer_pb2_grpc, expenseCategorizer_pb2
+from interface.grpc.servicer.generated import expenseCategorizer_pb2
+from interface.grpc.servicer.generated import expenseCategorizer_pb2_grpc
 
 
 class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerServicer):
