@@ -22,9 +22,14 @@ class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerSer
 
     def getExpenseCategoryUnary(self, request, context):
         print("Request received")
-        logging.info("Request Received: %s", request)
-        response = {
-            "category": self.expenseCategorizer.getCategory(request.head)[0]
-        }
+        logging.info("Request Received: %s", request.head)
+        if (request.head == ""):
+            response = {
+                "category": "Other"
+            }
+        else:
+            response = {
+                "category": self.expenseCategorizer.getCategory(request.head)[0]
+            }
         logging.info("Response: %s", response)
         return expenseCategorizer_pb2.ExpenseCategorizationResponse(**response)
