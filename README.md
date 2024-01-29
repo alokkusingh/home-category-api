@@ -6,6 +6,14 @@ python -m grpc_tools.protoc -Iproto --python_out=interface/grpc/servicer/generat
 ```
 
 ```shell
+pip install neptune
+```
+```shell
+pip install neptune-notebooks
+jupyter nbextension enable --py neptune-notebooks
+```
+
+```shell
 docker build -t alokkusingh/home-category-api:latest -t alokkusingh/home-category-api:1.0.0 .
 ```
 ```shell
@@ -21,20 +29,20 @@ docker run -p 5051:50051 --rm --name home-category-api alokkusingh/home-category
 brew install grpcurl
 ```
 ```shell
-grpcurl --plaintext localhost:50051 list
+grpcurl --plaintext localhost:5051 list
 ```
 ```shell
-grpcurl -plaintext localhost:50051 describe
+grpcurl -plaintext localhost:5051 describe
 ```
 ```shell
-grpcurl -plaintext localhost:50051 describe ExpenseCategorizer
+grpcurl -plaintext localhost:5051 describe interface.grpc.servicer.ExpenseCategorizer
 ```
 ```shell
-grpcurl -plaintext localhost:50051 describe grpc.health.v1.Health
+grpcurl -plaintext localhost:5051 describe grpc.health.v1.Health
 ```
 ```shell
-grpcurl -plaintext localhost:50051 grpc.health.v1.Health/Check
+grpcurl -plaintext localhost:5051 grpc.health.v1.Health/Check
 ```
 ```shell
-grpcurl -plaintext -d '{"head": "Netflix recharge"}' localhost:50051 ExpenseCategorizer/getExpenseCategoryUnary
+grpcurl -plaintext -d '{"head": "steamer"}' localhost:5051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
