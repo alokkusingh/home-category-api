@@ -44,5 +44,5 @@ grpcurl -plaintext localhost:5051 describe grpc.health.v1.Health
 grpcurl -plaintext localhost:5051 grpc.health.v1.Health/Check
 ```
 ```shell
-grpcurl -plaintext -d '{"head": "steamer"}' localhost:5051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
+grpcurl -plaintext -d '{"head": "Nanny"}' localhost:5051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
