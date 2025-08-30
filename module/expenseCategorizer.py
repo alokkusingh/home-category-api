@@ -1,7 +1,7 @@
 import joblib
 
 class ExpenseCategorizer:
-    # model = joblib.load("/Users/aloksingh/git/home-category-api/model/expense-categorization-mdl.joblib");
+    # model = joblib.load("/Users/aloksingh/git/home-category-api/model/expense-categorization-LR-mdl.joblib");
     # count_vect = joblib.load("/Users/aloksingh/git/home-category-api/model/expense-categorization-vct.joblib");
 
     def __init__(self):

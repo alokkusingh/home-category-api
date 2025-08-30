@@ -7,7 +7,7 @@ from interface.grpc.servicer.generated import expenseCategorizer_pb2_grpc
 
 class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerServicer):
     def __init__(self):
-        self.expenseCategorizer = ExpenseCategorizer();
+        self.expenseCategorizer = ExpenseCategorizer()
 
     def getExpenseCategory(self, request_iterator, context):
         for request in request_iterator:
