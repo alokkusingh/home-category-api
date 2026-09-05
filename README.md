@@ -44,7 +44,7 @@ grpcurl -plaintext localhost:5051 describe grpc.health.v1.Health
 grpcurl -plaintext localhost:5051 grpc.health.v1.Health/Check
 ```
 ```shell
-grpcurl -plaintext -d '{"head": "Dentist"}' 127.0.0.1:5051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
+grpcurl -plaintext -d '{"head": "Drawing class"}' 127.0.0.1:5051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
 ```shell
 kubectl replace --force -f /Users/aloksingh/git/home-stack/yaml/home-analytics-service.yaml --namespace=home-stack
