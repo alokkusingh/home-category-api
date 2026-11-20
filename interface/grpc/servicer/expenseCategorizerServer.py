@@ -1,4 +1,6 @@
+from __future__ import annotations
 import logging
+import re
 import joblib
 import numpy as np
 import pandas as pd
@@ -10,31 +12,76 @@ from interface.grpc.servicer.generated import expenseCategorizer_pb2_grpc
 logger = logging.getLogger(__name__)
 CONFIDENCE_THRESHOLD = 0.55
 
+# Targeted high-precision keyword overrides for rare terms / common typos
+KEYWORD_OVERRIDES = [
+    (re.compile(r'\b(dummy|test)\b', re.IGNORECASE), "Other"),
+    (re.compile(r'physiotherap', re.IGNORECASE), "Medical"),
+    (re.compile(r'nursing', re.IGNORECASE), "Medical"),
+    (re.compile(r'pollution\s*cert', re.IGNORECASE), "Maintenance"),
+    (re.compile(r'magic\s*bricks', re.IGNORECASE), "Maintenance"),
+    (re.compile(r'society\s*helper', re.IGNORECASE), "House Help"),
+    (re.compile(r'\bcook\b', re.IGNORECASE), "House Help"),
+    (re.compile(r'stiching|stitching|tailor', re.IGNORECASE), "Accessories"),
+    (re.compile(r'trolly|trolley', re.IGNORECASE), "Accessories"),
+    (re.compile(r'bracelet', re.IGNORECASE), "Accessories"),
+    (re.compile(r'\b(snacs|snax)\b', re.IGNORECASE), "Food Outside"),
+    (re.compile(r'\bwatee\b', re.IGNORECASE), "Grocery"),
+    (re.compile(r'\bpuja\b', re.IGNORECASE), "Other"),
+    (re.compile(r'\bcracker\b', re.IGNORECASE), "Celebration"),
+    (re.compile(r'\bdoll\b', re.IGNORECASE), "Toys")
+]
+
 
 class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerServicer):
-    def __init__(self, model_path: str = "expense-pipeline.joblib"):
+    def __init__(self, model_path: str = "model/expense-pipeline.joblib"):
         logger.info("Loading 3-parameter ML model from %s", model_path)
         self.pipeline = joblib.load(model_path)
         self.classes = self.pipeline.classes_
+        # Exact category name lookup (e.g. head="Appliances" -> "Appliances")
+        self.exact_category_map = {str(c).strip().lower(): str(c) for c in self.classes}
+
+    def _rule_lookup(self, head: str) -> str | None:
+        normalized = (head or "").strip().lower()
+        if not normalized:
+            return None
+        if normalized in self.exact_category_map:
+            return self.exact_category_map[normalized]
+        for pattern, target_category in KEYWORD_OVERRIDES:
+            if pattern.search(normalized) and target_category in self.classes:
+                return target_category
+        return None
 
     def _predict_single(self, request) -> expenseCategorizer_pb2.ExpenseCategorizationResponse:
+        head = request.head or ""
+        comment = request.comment or ""
+        amount = float(request.amount or 0.0)
+
+        # 1. Deterministic exact-category & domain-keyword fast path
+        rule_category = self._rule_lookup(head)
+        if rule_category is not None:
+            return expenseCategorizer_pb2.ExpenseCategorizationResponse(
+                category=rule_category,
+                confidence=1.0,
+                needs_review=False,
+            )
+
+        # 2. ML inference on all 3 parameters
         input_df = pd.DataFrame([{
-            "Head": request.head or "",
-            "comment": request.comment or "",
-            "amount": float(request.amount or 0.0),
+            "Head": head,
+            "comment": comment,
+            "amount": amount,
         }])
 
         probs = self.pipeline.predict_proba(input_df)[0]
         best_idx = int(np.argmax(probs))
         confidence = float(probs[best_idx])
-
         category = str(self.classes[best_idx])
         needs_review = confidence < CONFIDENCE_THRESHOLD
 
         if needs_review:
             logger.warning(
                 "Low confidence (%.2f) for head='%s', amount=%.2f -> '%s'",
-                confidence, request.head, request.amount, category
+                confidence, head, amount, category
             )
 
         return expenseCategorizer_pb2.ExpenseCategorizationResponse(

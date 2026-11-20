@@ -64,7 +64,19 @@ grpcurl -plaintext -d '{"head": "Chicken"}' 127.0.0.1:50051 interface.grpc.servi
 grpcurl -plaintext -d '{"head": "Drawing class", "comment": "Something", "amount": 500}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
 ```shell
-grpcurl -plaintext -d '{"head": "birthday", "comment": "party", "amount": 1090500}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
+grpcurl -plaintext -d '{"head": "birthday", "comment": "", "amount": 1090500}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
+```
+```shell
+grpcurl -plaintext -d '{"head": "fitness", "comment": "", "amount": 1090500}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
+```
+```shell
+grpcurl -plaintext -d '{"head": "Stationary", "comment": "", "amount": 100}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
+```
+```shell
+grpcurl -plaintext -d '{"head": "Physiotherepist", "comment": "", "amount": 100}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
+```
+```shell
+grpcurl -plaintext -d '{"head": "Auto", "comment": "", "amount": 100}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
 ```shell
 kubectl replace --force -f /Users/aloksingh/git/home-stack/yaml/home-analytics-service.yaml --namespace=home-stack
