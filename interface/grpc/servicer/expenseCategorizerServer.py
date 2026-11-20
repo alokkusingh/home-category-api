@@ -14,11 +14,21 @@ CONFIDENCE_THRESHOLD = 0.55
 
 # Targeted high-precision keyword overrides for rare terms / common typos
 KEYWORD_OVERRIDES = [
-    (re.compile(r'\b(dummy|test)\b', re.IGNORECASE), "Other"),
+    (
+        re.compile(
+            r'\b(blood\s*test|lab\s*test|diagnostic|x[\s-]*ray|mri|ct\s*scan|'
+            r'ultrasound|sonography|ecg|echo|pathology|biopsy|cbc|thyroid|'
+            r'lipid\s*profile|vitamin\s*[bd]|checkup|health\s*check|'
+            r'thyrocare|lal\s*pathlabs|aarthi\s*scans|metropolis|orange\s*health|healthians)\b',
+            re.IGNORECASE,
+        ),
+        "Medical",
+    ),
+    (re.compile(r'\b(dummy)\b', re.IGNORECASE), "Other"),
     (re.compile(r'physiotherap', re.IGNORECASE), "Medical"),
     (re.compile(r'nursing', re.IGNORECASE), "Medical"),
     (re.compile(r'pollution\s*cert', re.IGNORECASE), "Maintenance"),
-    (re.compile(r'magic\s*bricks', re.IGNORECASE), "Maintenance"),
+    (re.compile(r'magic\s*bricks', re.IGNORECASE), "Bills"),
     (re.compile(r'society\s*helper', re.IGNORECASE), "House Help"),
     (re.compile(r'\bcook\b', re.IGNORECASE), "House Help"),
     (re.compile(r'stiching|stitching|tailor', re.IGNORECASE), "Accessories"),
@@ -37,18 +47,23 @@ class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerSer
         logger.info("Loading 3-parameter ML model from %s", model_path)
         self.pipeline = joblib.load(model_path)
         self.classes = self.pipeline.classes_
-        # Exact category name lookup (e.g. head="Appliances" -> "Appliances")
-        self.exact_category_map = {str(c).strip().lower(): str(c) for c in self.classes}
 
-    def _rule_lookup(self, head: str) -> str | None:
-        normalized = (head or "").strip().lower()
-        if not normalized:
-            return None
-        if normalized in self.exact_category_map:
-            return self.exact_category_map[normalized]
-        for pattern, target_category in KEYWORD_OVERRIDES:
-            if pattern.search(normalized) and target_category in self.classes:
-                return target_category
+        self.exact_category_map = {str(c).lower(): str(c) for c in self.classes}
+        self.exact_category_map.update({
+            "stationary": "Education",
+            "snacs": "Food Outside",
+            "watee": "Grocery",
+        })
+
+    def _rule_lookup(self, head: str, comment: str = "") -> str | None:
+        cleaned_head = head.strip().lower()
+        if cleaned_head in self.exact_category_map:
+            return self.exact_category_map[cleaned_head]
+
+        combined = f"{head} {comment}".strip()
+        for pattern, category in KEYWORD_RULES:
+            if pattern.search(combined):
+                return category
         return None
 
     def _predict_single(self, request) -> expenseCategorizer_pb2.ExpenseCategorizationResponse:
@@ -56,8 +71,7 @@ class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerSer
         comment = request.comment or ""
         amount = float(request.amount or 0.0)
 
-        # 1. Deterministic exact-category & domain-keyword fast path
-        rule_category = self._rule_lookup(head)
+        rule_category = self._rule_lookup(head, comment)
         if rule_category is not None:
             return expenseCategorizer_pb2.ExpenseCategorizationResponse(
                 category=rule_category,
@@ -65,7 +79,6 @@ class ExpenseCategorizerServer(expenseCategorizer_pb2_grpc.ExpenseCategorizerSer
                 needs_review=False,
             )
 
-        # 2. ML inference on all 3 parameters
         input_df = pd.DataFrame([{
             "Head": head,
             "comment": comment,
