@@ -12,7 +12,7 @@ from sklearn import metrics
 from model_utils import build_features
 
 CSV_PATH = os.path.expanduser("~/Downloads/Expense Sheet - Categorized.csv")
-CORRECTIONS_PATH = "corrections.csv"
+CORRECTIONS_PATH = "data/corrections.csv"
 MODEL_OUTPUT_PATH = "model/expense-pipeline.joblib"
 
 DIAGNOSTIC_PATTERN = (
