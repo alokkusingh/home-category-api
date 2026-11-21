@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 CONFIDENCE_THRESHOLD = 0.55
 
 # Targeted high-precision keyword overrides for rare terms / common typos
-KEYWORD_OVERRIDES = [
+KEYWORD_RULES = [
     (
         re.compile(
             r'\b(blood\s*test|lab\s*test|diagnostic|x[\s-]*ray|mri|ct\s*scan|'
