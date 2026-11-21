@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import grpc
 
@@ -6,6 +7,16 @@ from interface.grpc.servicer.generated import expenseCategorizer_pb2
 from interface.grpc.servicer.generated import expenseCategorizer_pb2_grpc
 
 HOST = "127.0.0.1:50051"
+
+# Enable ANSI colors in PyCharm Run Console and interactive terminals
+USE_COLOR = sys.stdout.isatty() or os.environ.get("PYCHARM_HOSTED") == "1"
+
+GREEN = "\033[92m" if USE_COLOR else ""
+RED = "\033[91m" if USE_COLOR else ""
+YELLOW = "\033[93m" if USE_COLOR else ""
+CYAN = "\033[96m" if USE_COLOR else ""
+BOLD = "\033[1m" if USE_COLOR else ""
+RESET = "\033[0m" if USE_COLOR else ""
 
 # (head, comment, amount, expected_category)
 TEST_CASES = [
@@ -16,6 +27,9 @@ TEST_CASES = [
     ("fitness", "", 1090500.0, "Fitness"),
     ("Stationary", "", 100.0, "Education"),
     ("Physiotherepist", "", 100.0, "Medical"),
+    ("Physiotherapist", "", 600.0, "Medical"),
+    ("Physio therapist", "", 600.0, "Medical"),
+    ("Physio", "", 700.0, "Medical"),
     ("Auto", "", 100.0, "Travel"),
     ("Dishwasher", "", 459.0, "Grocery"),
     (
@@ -90,14 +104,14 @@ def run_validation() -> int:
     try:
         grpc.channel_ready_future(channel).result(timeout=3)
     except grpc.FutureTimeoutError:
-        print(f"ERROR: Could not connect to gRPC server at {HOST}")
+        print(f"{BOLD}{RED}ERROR: Could not connect to gRPC server at {HOST}{RESET}")
         return 1
 
     stub = expenseCategorizer_pb2_grpc.ExpenseCategorizerStub(channel)
 
-    print(f"\nRunning {len(TEST_CASES)} gRPC model validation tests against {HOST}...\n")
+    print(f"\n{BOLD}{CYAN}Running {len(TEST_CASES)} gRPC model validation tests against {HOST}...{RESET}\n")
     header = f"{'STATUS':<8} {'HEAD':<20} {'AMOUNT':>10} {'EXPECTED':<15} {'ACTUAL':<15} {'CONF':>7}"
-    print(header)
+    print(f"{BOLD}{header}{RESET}")
     print("-" * len(header))
 
     passed = 0
@@ -120,13 +134,17 @@ def run_validation() -> int:
             conf = 0.0
             ok = False
 
-        status = "PASS" if ok else "FAIL"
         if ok:
             passed += 1
         else:
             failed += 1
 
-        print(f"{status:<8} {head:<20} {amount:>10.2f} {expected:<15} {actual:<15} {conf:>6.2%}")
+        status_color = GREEN if ok else RED
+        padded_status = f"{BOLD}{status_color}{'PASS' if ok else 'FAIL':<8}{RESET}"
+        conf_color = YELLOW if conf < 0.60 else GREEN
+        padded_conf = f"{conf_color}{conf:>6.2%}{RESET}"
+
+        print(f"{padded_status} {head:<20} {amount:>10.2f} {expected:<15} {actual:<15} {padded_conf}")
 
     # 2. Validate Bidirectional Streaming RPC in one batch
     requests = [
@@ -138,9 +156,13 @@ def run_validation() -> int:
         r.category == expected for r, (_, _, _, expected) in zip(stream_responses, TEST_CASES)
     )
 
+    summary_color = GREEN if (failed == 0 and stream_ok) else RED
     print("-" * len(header))
-    print(f"Unary Summary:     {passed}/{len(TEST_CASES)} passed, {failed} failed")
-    print(f"Streaming Batch:   {'PASS' if stream_ok else 'FAIL'} ({len(stream_responses)}/{len(TEST_CASES)} responses)\n")
+    print(f"Unary Summary:     {BOLD}{summary_color}{passed}/{len(TEST_CASES)} passed, {failed} failed{RESET}")
+    print(
+        f"Streaming Batch:   {BOLD}{GREEN if stream_ok else RED}"
+        f"{'PASS' if stream_ok else 'FAIL'}{RESET} ({len(stream_responses)}/{len(TEST_CASES)} responses)\n"
+    )
 
     channel.close()
     return 0 if (failed == 0 and stream_ok) else 1
