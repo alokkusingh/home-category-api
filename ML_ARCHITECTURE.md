@@ -19,7 +19,7 @@ This document outlines the machine learning training pipeline, runtime inference
 
 ---
 
-## 2. Training Approach (`train_model.py` & `model_utils.py`)
+## 2. Training Approach (`training/train_model.py` & `model_utils.py`)
 
 ### Data Preparation & Normalization
 1. **Noise Filtering:** Strips synthetic/placeholder records (`Dummy`, `test`, `T est`, `Tes`) and rows with `amount <= 1.0`.

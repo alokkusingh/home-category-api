@@ -38,7 +38,9 @@ pip install neptune-notebooks
 jupyter nbextension enable --py neptune-notebooks
 ```
 
+## Test Locally
 ```bash
+# Install gRPC CURL Client
 brew install grpcurl
 ```
 ```bash
@@ -99,9 +101,13 @@ grpcurl -plaintext -d '{"head": "Dishwasher", "comment": "INR 32472 at Flipkart 
 # Expected - Fitness
 grpcurl -plaintext -d '{"head": "Protein Powder", "comment": "", "amount": 5000}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
+
+## Redeploy
 ```bash
+# Restart Home Analytics Service
 kubectl replace --force -f /Users/aloksingh/git/home-stack/yaml/home-analytics-service.yaml --namespace=home-stack
 ```
 ```bash
+# Restart Nginx to update DNS cache with restarted service IP
 kubectl replace --force -f /Users/aloksingh/git/home-stack/yaml/dashboard-service.yaml
 ```
