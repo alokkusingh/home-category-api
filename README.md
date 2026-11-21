@@ -20,12 +20,9 @@ python train_model.py
 
 ## Build Container
 ```bash
+# Build and ublish
 docker build -t alokkusingh/home-category-api:latest -t alokkusingh/home-category-api:1.0.0 .
-```
-```bash
 docker push alokkusingh/home-category-api:latest
-```
-```bash
 docker push alokkusingh/home-category-api:1.0.0
 ```
 ### Run Locally
