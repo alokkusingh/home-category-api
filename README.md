@@ -2,85 +2,87 @@
 Home Stack Classification API using ML model
 
 ## Build gRPC Stubs
-```shell
+```bash
 python -m grpc_tools.protoc -Iproto --python_out=interface/grpc/servicer/generated --pyi_out=interface/grpc/servicer/generated --grpc_python_out=interface/grpc/servicer/generated proto/expenseCategorizer.proto
 ```
 
 ## Train Model
-```shell
+```bash
 python train_model.py
 ```
 
 ## Run Locally
-```shell
-python main.py 
+```bash
+# 1. Update ~/Downloads/Expense Sheet - Categorized.csv (or append to corrections.csv)
+# 2. Run training and overwrite model/expense-pipeline.joblib
+python train_model.py
 ```
 
 ## Build Container
-```shell
+```bash
 docker build -t alokkusingh/home-category-api:latest -t alokkusingh/home-category-api:1.0.0 .
 ```
-```shell
+```bash
 docker push alokkusingh/home-category-api:latest
 ```
-```shell
+```bash
 docker push alokkusingh/home-category-api:1.0.0
 ```
 ### Run Locally
-```shell
+```bash
 docker run -p 50051:50051 --rm --name home-category-api alokkusingh/home-category-api
 ```
 
-```shell
+```bash
 pip install neptune
 ```
-```shell
+```bash
 pip install neptune-notebooks
 jupyter nbextension enable --py neptune-notebooks
 ```
 
-```shell
+```bash
 brew install grpcurl
 ```
-```shell
+```bash
 grpcurl --plaintext localhost:50051 list
 ```
-```shell
+```bash
 grpcurl -plaintext localhost:50051 describe
 ```
-```shell
+```bash
 grpcurl -plaintext localhost:50051 describe interface.grpc.servicer.ExpenseCategorizer
 ```
-```shell
+```bash
 grpcurl -plaintext localhost:5051 describe grpc.health.v1.Health
 ```
-```shell
+```bash
 grpcurl -plaintext localhost:50051 grpc.health.v1.Health/Check
 ```
-```shell
+```bash
 grpcurl -plaintext -d '{"head": "Chicken"}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
-```shell
+```bash
 grpcurl -plaintext -d '{"head": "Drawing class", "comment": "Something", "amount": 500}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
-```shell
+```bash
 grpcurl -plaintext -d '{"head": "birthday", "comment": "", "amount": 1090500}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
-```shell
+```bash
 grpcurl -plaintext -d '{"head": "fitness", "comment": "", "amount": 1090500}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
-```shell
+```bash
 grpcurl -plaintext -d '{"head": "Stationary", "comment": "", "amount": 100}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
-```shell
+```bash
 grpcurl -plaintext -d '{"head": "Physiotherepist", "comment": "", "amount": 100}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
-```shell
+```bash
 grpcurl -plaintext -d '{"head": "Auto", "comment": "", "amount": 100}' 127.0.0.1:50051 interface.grpc.servicer.ExpenseCategorizer/getExpenseCategoryUnary
 ```
-```shell
+```bash
 kubectl replace --force -f /Users/aloksingh/git/home-stack/yaml/home-analytics-service.yaml --namespace=home-stack
 ```
-```shell
+```bash
 kubectl replace --force -f /Users/aloksingh/git/home-stack/yaml/dashboard-service.yaml
 ```
