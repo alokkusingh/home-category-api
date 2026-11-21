@@ -10,7 +10,8 @@ def clean_text(text: str) -> str:
     text = re.sub(r'spent on your SBI Credit Card ending \d+ at', ' ', text, flags=re.IGNORECASE)
     text = re.sub(r'UPI transaction reference no.*', ' ', text, flags=re.IGNORECASE)
     text = re.sub(r'To check your available balance.*', ' ', text, flags=re.IGNORECASE)
-    text = re.sub(r'[^a-zA-Z\s]', ' ', text)
+    # Keep Unicode letters (English + Hindi/Devanagari) while removing digits & punctuation
+    text = re.sub(r'[\d_]|[^\w\s]', ' ', text)
     return re.sub(r'\s+', ' ', text).strip().lower()
 
 

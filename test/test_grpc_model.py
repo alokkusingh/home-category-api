@@ -109,7 +109,7 @@ TEST_CASES = [
     ("Watee", "", 150.0, "Grocery"),
     ("Snacs", "", 210.0, "Food Outside"),
 
-    # --- New Extended CSV Cases (2026 Entries) ---
+    # --- Extended CSV Cases (2026 Entries) ---
     (
         "School fee",
         "NPS 1%2F2 Rs.143000.00 has been debited from HDFC Bank Account Number XXXXXXXXXX0531 towards National Public School",
@@ -144,6 +144,25 @@ TEST_CASES = [
         1363.1,
         "Baby Care",
     ),
+
+    # --- Approved Corrections Regression Cases ---
+    ("ऑटो", "", 107.0, "Travel"),
+    (
+        "Hotter recho",
+        "149.00 has been debited from account 0531 to VPA hotstaronline%40ybl JioHotstar on 08-03-26.",
+        149.0,
+        "Bills",
+    ),
+    ("Cell", "For blood sugar monitor", 60.0, "Medical"),
+    ("Crape bandage", "", 0.0, "Medical"),
+    ("Dishwasher detergent", "", 725.0, "Grocery"),
+    ("Pooja items", "Diwali", 1035.0, "Celebration"),
+    ("Pitchkari+gulal", "", 571.0, "Celebration"),
+    ("Laddo", "", 500.0, "Food Outside"),
+    ("Dustbin", "Cushion cover and dust bin", 1017.0, "Household"),
+    ("Little joy", "", 554.0, "Baby Care"),
+    ("Puc", "", 115.0, "Maintenance"),
+    ("Payment", "Dance Teacher", 2500.0, "Education"),
 ]
 
 

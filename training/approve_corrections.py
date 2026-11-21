@@ -4,9 +4,9 @@ import os
 import sys
 import joblib
 
-PENDING_PATH = os.getenv("PENDING_CORRECTIONS_PATH", "data/corrections_pending.csv")
-CORRECTIONS_PATH = os.getenv("CORRECTIONS_PATH", "data/corrections.csv")
-MODEL_PATH = os.getenv("MODEL_PATH", "model/expense-pipeline.joblib")
+PENDING_PATH = os.getenv("PENDING_CORRECTIONS_PATH", "../data/corrections_pending.csv")
+CORRECTIONS_PATH = os.getenv("CORRECTIONS_PATH", "../data/corrections.csv")
+MODEL_PATH = os.getenv("MODEL_PATH", "../model/expense-pipeline.joblib")
 
 
 def load_known_categories() -> list[str]:
