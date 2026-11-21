@@ -24,7 +24,7 @@ TEST_CASES = [
     ("Chicken", "", 0.0, "Grocery"),
     ("Drawing class", "Something", 500.0, "Education"),
     ("birthday", "", 34000.0, "Celebration"),
-    ("fitness", "", 19000.0, "Fitness"),
+    ("fitness", "", 1090500.0, "Fitness"),
     ("Stationary", "", 100.0, "Education"),
     ("Physiotherepist", "", 100.0, "Medical"),
     ("Physiotherapist", "", 600.0, "Medical"),
@@ -46,7 +46,7 @@ TEST_CASES = [
     ),
     ("Protein Powder", "", 5000.0, "Fitness"),
 
-    # --- Real CSV Edge Cases: Generic Headers Disambiguated by Comment ---
+    # --- Generic Headers Disambiguated by Comment ---
     (
         "Groceries",
         "Rs 1108.00 has been debited from account 0531 to VPA firstcry.payu@hdfcbank - Groviva, pediacure",
@@ -58,6 +58,18 @@ TEST_CASES = [
         "Rs 1556.00 has been debited from account 0531 to VPA swiggyinstamart@icici - Pediasure+colour",
         1556.0,
         "Baby Care",
+    ),
+    (
+        "Lunch",
+        "VPA **********************.rzp%40mairtel %28COMPASS INDIA FOOD SERVICES PR%29 on 13-11-26. UPI transaction reference no.%3A 868464764827.",
+        630.0,
+        "Food Outside",
+    ),
+    (
+        "Groceries +rakhi+",
+        "",
+        402.0,
+        "Gift",
     ),
     (
         "Lunch",
@@ -78,7 +90,7 @@ TEST_CASES = [
         "Education",
     ),
 
-    # --- Real CSV Edge Cases: Diagnostic & Medical ---
+    # --- Diagnostic & Medical ---
     ("Blood test", "Thyrocare", 1200.0, "Medical"),
     ("Scan", "Aarthi Scans ultrasound", 2500.0, "Medical"),
     (
@@ -88,7 +100,7 @@ TEST_CASES = [
         "Medical",
     ),
 
-    # --- Real CSV Edge Cases: Household, Maintenance & Typos ---
+    # --- Household, Bills & Typos ---
     ("Magic bricks", "Tatinum pro plan", 3699.0, "Bills"),
     ("Society helper", "", 200.0, "House Help"),
     ("Blouse stiching", "", 3800.0, "Accessories"),
@@ -96,6 +108,42 @@ TEST_CASES = [
     ("Mill", "Flour mill", 500.0, "Milk"),
     ("Watee", "", 150.0, "Grocery"),
     ("Snacs", "", 210.0, "Food Outside"),
+
+    # --- New Extended CSV Cases (2026 Entries) ---
+    (
+        "School fee",
+        "NPS 1%2F2 Rs.143000.00 has been debited from HDFC Bank Account Number XXXXXXXXXX0531 towards National Public School",
+        143000.0,
+        "Education",
+    ),
+    ("Phonics tution", "", 2000.0, "Education"),
+    ("Massager", "Cult", 1484.0, "Fitness"),
+    (
+        "Bedsheet",
+        "3%2C075.00 spent on your SBI Credit Card ending 2047 at Myntra on 02%2F11%2F26",
+        3075.0,
+        "Household",
+    ),
+    ("House cleaning", "", 2620.0, "House Help"),
+    ("Puja items + Decoration", "", 2204.0, "Other"),
+    (
+        "Donation",
+        "VPA *********************.rzp%40rxairtel %28Vaidic Dharma Sansthan%29 on 05-11-26.",
+        551.0,
+        "Gift",
+    ),
+    (
+        "Mutton",
+        "LICIOUS HOSA2 DELIGHTF on 16 Nov%2C 2026 at 07%3A48%3A03.",
+        1165.67,
+        "Grocery",
+    ),
+    (
+        "Pediasure",
+        "1363.10 has been debited from account 0531 to VPA apollopharmacy.payu%40axisbank APOLLO PHARMACIES LIMITED on 24-03-26.",
+        1363.1,
+        "Baby Care",
+    ),
 ]
 
 
@@ -110,7 +158,7 @@ def run_validation() -> int:
     stub = expenseCategorizer_pb2_grpc.ExpenseCategorizerStub(channel)
 
     print(f"\n{BOLD}{CYAN}Running {len(TEST_CASES)} gRPC model validation tests against {HOST}...{RESET}\n")
-    header = f"{'STATUS':<8} {'HEAD':<20} {'AMOUNT':>10} {'EXPECTED':<15} {'ACTUAL':<15} {'CONF':>7}"
+    header = f"{'STATUS':<8} {'HEAD':<24} {'AMOUNT':>10} {'EXPECTED':<15} {'ACTUAL':<15} {'CONF':>7}"
     print(f"{BOLD}{header}{RESET}")
     print("-" * len(header))
 
@@ -144,7 +192,7 @@ def run_validation() -> int:
         conf_color = YELLOW if conf < 0.60 else GREEN
         padded_conf = f"{conf_color}{conf:>6.2%}{RESET}"
 
-        print(f"{padded_status} {head:<20} {amount:>10.2f} {expected:<15} {actual:<15} {padded_conf}")
+        print(f"{padded_status} {head:<24} {amount:>10.2f} {expected:<15} {actual:<15} {padded_conf}")
 
     # 2. Validate Bidirectional Streaming RPC in one batch
     requests = [
