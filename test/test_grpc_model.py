@@ -24,7 +24,7 @@ TEST_CASES = [
     ("Chicken", "", 0.0, "Grocery"),
     ("Drawing class", "Something", 500.0, "Education"),
     ("birthday", "", 34000.0, "Celebration"),
-    ("fitness", "", 1090500.0, "Fitness"),
+    ("fitness", "", 19000.0, "Fitness"),
     ("Stationary", "", 100.0, "Education"),
     ("Physiotherepist", "", 100.0, "Medical"),
     ("Physiotherapist", "", 600.0, "Medical"),
