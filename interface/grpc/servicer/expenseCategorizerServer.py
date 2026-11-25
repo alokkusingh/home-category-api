@@ -45,7 +45,10 @@ KEYWORD_RULES = [
     (re.compile(r'\bwatee\b', re.IGNORECASE), "Grocery"),
     (re.compile(r'\bpuja\b', re.IGNORECASE), "Other"),
     (re.compile(r'\bcracker\b', re.IGNORECASE), "Celebration"),
-    (re.compile(r'\bdoll\b', re.IGNORECASE), "Toys")
+    (re.compile(r'\bdoll\b', re.IGNORECASE), "Toys"),
+    (re.compile(r'\b(detergent|surf\s*excel|ariel|tide|vim\s*liquid|fabric\s*softener|comfort)\b', re.IGNORECASE),
+     "Grocery"),
+
 ]
 
 

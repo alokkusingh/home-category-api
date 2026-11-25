@@ -163,6 +163,11 @@ TEST_CASES = [
     ("Little joy", "", 554.0, "Baby Care"),
     ("Puc", "", 115.0, "Maintenance"),
     ("Payment", "Dance Teacher", 2500.0, "Education"),
+    ("Skipping rope", "", 428.0, "Fitness"),
+    ("Shopping", "Makeup", 669.0, "Grooming"),
+    ("Cloth iron", "", 310.0, "House Help"),
+    ("Shopping", "Bride gift", 6095.0, "Gift"),
+    ("Detergent powder", "", 666.0, "Grocery"),
 ]
 
 
