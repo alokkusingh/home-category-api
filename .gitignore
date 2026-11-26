@@ -1,0 +1,6 @@
+/.venv/
+/.venv-slm/
+/training/slm/adapters/
+/training/slm/model/
+/lora_data/
+/data/
