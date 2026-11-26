@@ -1,4 +1,4 @@
-# Local SLM LoRA Fine-Tuning (`training/slm`)
+# Local SLM LoRA Fine-Tuning (``)
 
 This module fine-tunes a local Small Language Model (**Qwen2.5-3B-Instruct-4bit** / **1.5B**) using **LoRA (`mlx-lm`)** on Apple Silicon (`arm64`) to classify Indian personal and household expenses from `Head`, `comment`, and `amount`.
 
@@ -40,7 +40,7 @@ home-category-api/
 1. **Ensure training data is up to date:**
    * Main sheet: `~/Downloads/Expense Sheet - Categorized.csv`
    * Approved corrections: `data/corrections.csv` (promoted via `python approve_corrections.py`)
-2. **Open `training/slm/train_lora_slm.ipynb`** in PyCharm or Jupyter Lab.
+2. **Open ``** in PyCharm or Jupyter Lab.
 3. **Verify `PROJECT_ROOT` in Cell 2:**
    ```python
    PROJECT_ROOT = Path.cwd().resolve().parents[1]  # Resolves to /Users/aloksingh/git/home-category-api
