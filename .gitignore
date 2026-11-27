@@ -2,5 +2,5 @@
 /.venv-slm/
 /training/lora/adapters/
 /training/lora/model/
-/lora_data/
+/training/lora/lora_data/
 /data/
