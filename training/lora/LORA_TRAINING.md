@@ -126,3 +126,128 @@ Evaluated on the same stratified holdout split (`1,125` unseen Indian household 
 * **Where the LoRA SLM (`Qwen2.5`) Wins:**
   * **Unseen Brand & Semantic Generalization:** Leverages pre-trained knowledge of Indian commerce (`JioHotstar` → `Bills`, `COMPASS INDIA FOOD SERVICES` → `Food Outside`, `Thyrocare` → `Medical`, Hindi `ऑटो` → `Travel`) even when exact tokens were rare in historical logs.
   * **Offline Active-Learning Assistant:** Ideal for pre-labeling ambiguous transactions in `data/corrections_pending.csv` on a developer laptop before human approval.
+
+## 5. Execution Steps
+### MLX LM LoRA Fine-Tuning & Fusing Guide
+
+A quick reference guide for fine-tuning Large Language Models (LLMs) with Low-Rank Adaptation (LoRA) and fusing adapters on Apple silicon using `mlx-lm`.
+
+---
+
+#### 1. Installation
+
+Ensure `mlx-lm` is installed in your Python environment:
+
+```bash
+pip install mlx-lm
+```
+
+---
+
+#### 2. Prepare Your Dataset
+
+Create a directory (e.g., `./data`) containing JSON Lines (`.jsonl`) files:
+- `train.jsonl` *(Required)*
+- `valid.jsonl` *(Optional – for validation loss tracking)*
+- `test.jsonl` *(Optional – for final model evaluation)*
+
+##### Supported Formats
+
+**Chat Format (Recommended):**
+```json
+{"messages": [{"role": "user", "content": "What is MLX?"}, {"role": "assistant", "content": "An array framework for Apple silicon."}]}
+{"messages": [{"role": "user", "content": "Summarize this log."}, {"role": "assistant", "content": "System rebooted cleanly."}]}
+```
+
+**Prompt / Completion Format:**
+```json
+{"prompt": "Translate to French: Hello", "completion": "Bonjour"}
+```
+
+**Raw Text Format:**
+```json
+{"text": "Complete raw text document for continued pre-training."}
+```
+
+---
+
+#### 3. Train the LoRA Adapter (`mlx_lm.lora`)
+
+Run the training loop using a base model from Hugging Face (or a local path) and your dataset directory. Passing a 4-bit quantized model automatically performs **QLoRA**.
+
+```bash
+mlx_lm.lora \
+    --model mlx-community/Llama-3.2-3B-Instruct-4bit \
+    --train \
+    --data ./data \
+    --iters 600 \
+    --batch-size 4 \
+    --learning-rate 1e-5 \
+    --adapter-path ./adapters
+```
+
+##### Common Training Flags
+
+| Flag | Description |
+| :--- | :--- |
+| `--model` | Base Hugging Face repo ID or local model directory. |
+| `--train` | Enables the fine-tuning loop. |
+| `--data` | Directory containing `train.jsonl` (and optional `valid.jsonl`). |
+| `--iters` | Total number of training iterations. |
+| `--batch-size` | Examples per step (reduce to `1` or `2` if memory is tight). |
+| `--num-layers` | Number of layers to fine-tune (default is `16`; use `-1` for all layers). |
+| `--learning-rate` | Optimizer step size (default is `1e-5`). |
+| `--adapter-path` | Output directory for `adapters.safetensors` and `adapter_config.json`. |
+
+##### Evaluate on Test Data (Optional)
+```bash
+mlx_lm.lora \
+    --model mlx-community/Llama-3.2-3B-Instruct-4bit \
+    --adapter-path ./adapters \
+    --data ./data \
+    --test
+```
+
+---
+
+#### 4. Test Generation with the Adapter (`mlx_lm.generate`)
+
+Verify the adapter's output alongside the base model before permanently merging:
+
+```bash
+mlx_lm.generate \
+    --model mlx-community/Llama-3.2-3B-Instruct-4bit \
+    --adapter-path ./adapters \
+    --prompt "What is MLX?"
+```
+
+---
+
+#### 5. Fuse the Adapter into the Base Model (`mlx_lm.fuse`)
+
+Merge the trained LoRA adapter weights directly into the base model to produce a standalone model with zero inference overhead:
+
+```bash
+mlx_lm.fuse \
+    --model mlx-community/Llama-3.2-3B-Instruct-4bit \
+    --adapter-path ./adapters \
+    --save-path ./my-fused-model
+```
+
+##### Common Fusing Flags
+
+| Flag | Description |
+| :--- | :--- |
+| `--save-path` | Destination directory for the merged model (default: `./fused_model`). |
+| `--de-quantize` | Converts a quantized base model back to 16-bit precision when fusing. |
+| `--export-gguf` | Exports the merged model to GGUF format (Llama, Mistral, Mixtral). |
+| `--upload-repo` | Pushes the fused model directly to a Hugging Face repository. |
+
+##### Run the Fused Model
+Once fused, run the model without the `--adapter-path` flag:
+
+```bash
+mlx_lm.generate \
+    --model ./my-fused-model \
+    --prompt "What is MLX?"
+```
